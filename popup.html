@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRHelper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+        }
+        main {
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .content {
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 1200px; /* Increase max width for a wider layout */
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table caption {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .copy-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .copy-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="content">
+            <img src="./kitty.png" width="90px" alt="Kitty"/>
+            <h1>Hello Part-timers!</h1>
+
+            <table>
+                <caption>BBL RATE</caption>
+                <tr>
+                    <td>SELL</td>
+                    <td id="sell1">-</td>
+                    <td id="sell2">-</td>
+                </tr>
+                <tr>
+                    <td>1THB</td>
+                    <td id="1THB1">-</td>
+                    <td id="1THB2">-</td>
+                </tr>
+                <tr>
+                    <td>GAP (RAW)</td>
+                    <td id="GAP RAW1"></td>
+                    <td id="GAP RAW2">-</td>
+                </tr>
+                <tr>
+                    <td>GAP (ROUNDED)</td>
+                    <td id="GAP ROUNDED1"></td>
+                    <td id="GAP ROUNDED2">-</td>
+                </tr>
+            </table>
+            <p id="date">-</p>
+            <input type="number" id="gap" placeholder="Enter GAP" step="0.0001">
+        </div>
+
+        <button id="copyMgmFb" class="copy-button">ลิงค์ MGM FB</button>
+    </main>
+    <script src="popup.js"></script>  <!-- Move script to external file -->
+    <footer>
+        <!-- Footer content -->
+    </footer>
+</body>
+</html>

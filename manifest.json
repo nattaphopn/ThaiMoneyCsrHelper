@@ -1,0 +1,46 @@
+{
+    "manifest_version": 3,
+    "name": "CSRHelper",
+    "description": "CSRHelper make the Part-timer's life easier!",
+    "version": "1.0.5",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "logo.png"
+    },
+    "permissions": [
+        "contextMenus",
+        "tabs",
+        "scripting",
+        "tabs",
+        "storage",
+        "activeTab"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "run_at": "document_start",
+            "js": [
+                "mgm_arcQuery.js"
+            ],
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "https://th.admin.eui.money/*"
+            ],
+            "run_at": "document_end",
+            "js": [
+                "csr.js"
+            ],
+            "all_frames": true
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}
