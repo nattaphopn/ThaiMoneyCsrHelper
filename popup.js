@@ -1,4 +1,4 @@
-function bbl(n) {
+/*function bbl(n) {
     fetch("https://www.bbl.com.tw/exrate.asp")
         .then(response => response.text()) // Get response as text (HTML content)
         .then(data => {
@@ -61,3 +61,4 @@ document.getElementById("copyMgmFb").addEventListener("click", () => {
     navigator.clipboard.writeText(textToPaste)
 })
 
+*/

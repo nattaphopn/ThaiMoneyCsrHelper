@@ -1,3 +1,4 @@
+
 function logPreContent() {
   const preElements = document.querySelectorAll("pre");
   const logs = [];
@@ -14,6 +15,7 @@ function logPreContent() {
       let data = parsedData.data.filter(p => p.accountStatus == "\u003Cspan class=\"label label-success\"\u003EOn\u003C/span\u003E")[0]
       if (data.length !== 0) {
         let pkg = {
+          "arcNum":data.arcNum.substring(0, 10),
           "userId": data.id,
           "name_arc": data.full_name,
           "date_register": data.created_at,
@@ -36,4 +38,3 @@ function logPreContent() {
 setTimeout(() => {
   logPreContent();
 }, "100")
-

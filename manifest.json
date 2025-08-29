@@ -4,17 +4,19 @@
     "description": "CSRHelper make the Part-timer's life easier!",
     "version": "1.0.5",
     "action": {
-        "default_popup": "popup.html",
+        "default_popup": "popup/dist/index.html",
         "default_icon": "logo.png"
     },
     "permissions": [
         "contextMenus",
         "tabs",
         "scripting",
-        "tabs",
         "storage",
         "activeTab"
     ],
+    "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
     "content_scripts": [
         {
             "matches": [
