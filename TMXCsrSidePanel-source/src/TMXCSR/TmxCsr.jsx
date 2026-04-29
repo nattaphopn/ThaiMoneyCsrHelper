@@ -54,6 +54,7 @@ function TmxCsr() {
           "channel": leadData?.channel,
           "url": leadData?.url
         })
+        setLead([])
         return
       }
       if (res.data.leads.length == 1) {
@@ -97,11 +98,11 @@ function TmxCsr() {
       }
 
       {(Object.keys(preLead).length > 0 && Object.keys(config).length && Object.keys(lead).length == 0) && 
-        <LeadEditor mode="create" data={preLead} config={config} setLeadData={setLeadData} />
+        <LeadEditor mode="create" data={preLead} config={config} setLeadData={setLeadData} key={preLead.name}/>
       }
 
       {(Object.keys(lead).length > 0 && lead.lead_id == preLead.lead_id && Object.keys(config).length) &&
-        <LeadEditor mode="edit" data={preLead} config={config} setLeadData={setLeadData} />
+        <LeadEditor mode="edit" data={preLead} config={config} setLeadData={setLeadData} key={preLead.name}/>
       }
 
       {(Object.keys(lead).length > 0) &&

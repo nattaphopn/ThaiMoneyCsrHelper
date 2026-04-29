@@ -14,6 +14,20 @@ export const Opportunity = (props) => {
   const [screen, setScreen] = useState("listOpportunity");
 
   useEffect(() => {
+    if (typeof chrome !== "undefined" && chrome?.runtime?.onMessage) {
+      const handler = (message) => {
+        if (message.type === "TMX_CSR_DATA") {
+          setScreen("listOpportunity");
+        }
+      };
+      chrome.runtime.onMessage.addListener(handler);
+      return () => {
+        chrome.runtime.onMessage.removeListener(handler);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
     axios.get(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity/config`).then(res => {
       setConfig(res.data)
     })
@@ -114,8 +128,10 @@ const OpportunityEditor = (props) => {
     if (mode == "create") {
       axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity`, pkg).then(res => {
         setReload(v4())
-        setScreen("listOpportunity")
-        setEditOpportunity({})
+        setOpReload(v4())
+        setEditOpportunity(res.data.opportunity)
+       setScreen("viewOpportunity")
+      ///  setEditOpportunity({})
       })
       return
     } if (mode == "view") {
@@ -144,7 +160,6 @@ const handleKeyDown = (event) => {
         </c.Button>
         <c.Text fontFamily="Noto Sans" fontSize="16px" fontWeight="600" mt="10px">{mode == "create" ? "New Opportunity" : "Edit Opportunity"}</c.Text>
       </c.HStack>
-
 
       {config?.deal_detail?.map((item, index) => {
         return (
@@ -187,11 +202,11 @@ const handleKeyDown = (event) => {
           <c.HStack mt="10px">
               {acitvity.map(a => {
                 return(
-                <c.Menu preventOverflow="false">
+                <c.Menu>
                 <c.MenuButton w="50%" as={c.Button} colorScheme={a.color} >
                   {a.title}
                 </c.MenuButton>
-                <c.MenuList preventOverflow="false">
+                <c.MenuList maxH="300px" overflowY="auto">
                   {config?.activity?.filter(item => item?.includes(a.title)).map((item, index) => {
                     return ( <c.MenuItem key={index} value={item.replace(item.replace(a.title+':', ''))}
                     onClick={()=>{setSelectedActivity(item)}}
@@ -266,7 +281,13 @@ const JournalList = (props) => {
     <c.Box mt="20px">
       {journal.map((item, index) => {
         return (
-          <c.Box w="100%" style={{ cursor: 'pointer' }} key={index} bgColor={index == journal.length - 1 && "#eaf8f0"} onClick={()=>{handleJournalDelete(item)}}>
+          <c.Box w="100%" style={{ cursor: 'pointer' }} key={index} bgColor={index == journal.length - 1 && "#eaf8f0"} 
+          onClick={()=>{handleJournalDelete(item)}}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            handleJournalDelete(item);
+          }}
+          >
             <c.HStack p="5px" pb="10px">
               <c.Box fontFamily="Noto Sans">
                 <c.Text fontSize="10px"> {`${item.created_at.substring(0, 16)} - ${item.admin_name}`} </c.Text>
