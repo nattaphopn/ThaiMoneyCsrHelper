@@ -53,7 +53,7 @@ function App() {
 
   return (
     !isLoading &&
-    <c.Box bgColor="#f7f7f7" w="100%" h={window.innerHeight}>
+    <c.Box bgColor="#f7f7f7" w="100%" h="100%">
       <User />
       <TMXCSR_App />
       {/*
