@@ -2,7 +2,7 @@ let selectElement = document.getElementById("category_id");
 
 if (selectElement) {
 selectElement.addEventListener("change",async function () {
-let response = await fetch("http://localhost:19901/csr");
+let response = await fetch("https://service.th.dev.eui.money/api/csr");
 let contexts = await response.json();
   // Get the selected option
   let selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -23,7 +23,6 @@ let contexts = await response.json();
 
           let titleInput = document.getElementById("title");
           titleInput.value = newOptions[0]
-
           } 
           })
 });}
