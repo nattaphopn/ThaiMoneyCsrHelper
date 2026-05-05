@@ -18,7 +18,7 @@ function App() {
     const data = await chrome.storage.local.get("service_admin_token");
     if (data.service_admin_token) {
       localStorage.setItem("service_admin_token", data.service_admin_token.token);
-      fetchSession(setIsLoading)
+     fetchSession(setIsLoading)
     } else {
       fetchSession(setIsLoading)
     }

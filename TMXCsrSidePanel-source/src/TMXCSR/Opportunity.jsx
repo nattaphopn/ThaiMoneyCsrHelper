@@ -68,7 +68,7 @@ export const Opportunity = (props) => {
                     <c.Text fontSize="12px">{`${item.deal_detail?.goods}`}</c.Text>
                   </c.Box>
                   <c.Spacer />
-                              <c.VStack alignItems={"right"}>
+                  <c.VStack alignItems={"right"}>
                     <c.Text textAlign="right" fontSize="10px" fontWeight="600">{item.current_stage}</c.Text>
                     <c.Badge textAlign="right">{item.current_status}</c.Badge>
                   </c.VStack>
@@ -99,7 +99,8 @@ const OpportunityEditor = (props) => {
   const [opportunity, setOpportunity] = useState({});
   const [journal, setJournal] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedActivity, setSelectedActivity] = useState('');
+  const [selectedStage, setSelectedStage] = useState('');
+  const [selectedActivity, setSelectedActivity] = useState({});
   const [opReload, setOpReload] = useState('');
 
   useEffect(() => {
@@ -108,9 +109,11 @@ const OpportunityEditor = (props) => {
         setOpportunity(res.data.opportunity)
         setJournal(res.data.journal)
         setSelectedStatus(res.data.opportunity.current_status)
+        setSelectedStage(res.data.opportunity.current_stage)
       })
     }
-  }, [editOpportunity,opReload])
+  }, [editOpportunity, opReload])
+
 
   const handleOpportunity = () => {
     let deal_detail = {}
@@ -118,38 +121,111 @@ const OpportunityEditor = (props) => {
       deal_detail[item.field] = document.getElementById(item.field).value ?? ""
     })
     let update = {}
-    const updateFields = ['stage', 'status', 'close_reason', 'note']
+    const updateFields = ['status', 'close_reason', 'note']
     updateFields.map((item, index) => {
       update[item] = document?.getElementById(item)?.value ?? ""
     })
-    update['activity'] = selectedActivity
+
+    const activityList = [
+      ...(selectedActivity?.INQUIRY || []),
+      ...(selectedActivity?.COMPLAINT || [])
+    ];
+
+    update['stage'] = selectedStage
     let pkg = { lead_id: lead.lead_id, deal_detail, update }
 
     if (mode == "create") {
-      axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity`, pkg).then(res => {
-        setReload(v4())
-        setOpReload(v4())
-        setEditOpportunity(res.data.opportunity)
-       setScreen("viewOpportunity")
-      ///  setEditOpportunity({})
-      })
+     if (activityList.length > 0) {
+  // Define an async function to handle the sequential execution
+  const updateActivitiesSequentially = async () => {
+    try {
+      let lastRes = null;
+
+      for (const a of activityList) {
+        const response = await axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity`, {
+          ...pkg,
+          activity: a
+        });
+
+        // Verify the specific success status you requested
+        if (response.data.status === "success") {
+          lastRes = response;
+        } else {
+          // Optional: Handle cases where the API returns 200 OK but status isn't "success"
+          console.warn("Request completed but status was not success:", response.data);
+          break; // Stop the loop if a requirement isn't met
+        }
+      }
+
+      // After all (or the last successful) requests are done
+      if (lastRes) {
+        setReload(v4());
+        setOpReload(v4());
+        setEditOpportunity(lastRes.data.opportunity);
+        setScreen("viewOpportunity");
+      }
+    } catch (err) {
+      console.error("Failed to update activities during sequential execution:", err);
+    }
+  };
+
+  updateActivitiesSequentially();
+} else {
+        axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity`, pkg).then(res => {
+          setReload(v4());
+          setOpReload(v4());
+          setEditOpportunity(res.data.opportunity);
+          setScreen("viewOpportunity");
+        })
+      }
       return
     } if (mode == "view") {
       pkg['opportunity_id'] = opportunity.opportunity_id
-      axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity/update`, pkg).then(res => {
-        setOpReload(v4())
-        setReload(v4())
-      })
+if (activityList.length > 0) {
+  // Helper function to create the delay
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const processRequests = async () => {
+    for (const a of activityList) {
+      await axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity/update`, {
+        ...pkg,
+        update: { ...pkg.update, activity: a }
+      });
+      
+      // Wait 100ms before starting the next iteration
+      await delay(100);
+    }
+
+    // These run after all requests in the loop are finished
+    setOpReload(v4());
+    setReload(v4());
+    setSelectedActivity({});
+  };
+
+  processRequests();
+} else {
+        axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity/update`, pkg).then(res => {
+          setOpReload(v4())
+          setReload(v4())
+        })
+      }
       return
     }
   }
-const handleKeyDown = (event) => {
-  if (event.key === 'Enter') {
-    handleOpportunity()
-  }
-};
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleOpportunity()
+    }
+  };
 
-  const acitvity = [{"title":'INQUIRY', "color":"blue"}, {"title":'COMPLAINT', "color":"red"} ]
+  const handleSelectActivity = (value, title) => {
+    setSelectedActivity({
+      ...selectedActivity,
+      [title]: value
+    })
+  }
+
+  const activity = [{ "title": 'INQUIRY', "color": "blue" }, { "title": 'COMPLAINT', "color": "red" }]
 
   return (
     Object.keys(config).length &&
@@ -182,69 +258,108 @@ const handleKeyDown = (event) => {
       <JournalList journal={journal} config={config} setOpReload={setOpReload} />
 
       {mode == "view" &&
-      <c.Box bgColor='#f9f9f9' p="10px" borderRadius={'8px'} mt="10px" boxShadow="md">
+        <c.Box bgColor='#f9f9f9' p="10px" borderRadius={'8px'} mt="10px" boxShadow="md">
 
-        <c.Box mt="10px">
-          <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Stage</c.Text>
-          <c.Select id='stage' size="sm" defaultValue={opportunity?.current_stage ?? config?.stage?.[0]} key={opportunity?.opportunity_id}>
-            {config?.stage?.map((item, index) => {
-              return ( <option key={index} value={item}> {item} </option> );
-            })}
-          </c.Select>
-        </c.Box>
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Stage</c.Text>
+            <c.HStack alignItems="top" mt="10px">
+              {config?.stage?.map((item, index) => {
+                return (
+                  <c.Box w="20%" style={{ cursor: 'pointer' }} key={index} onClick={() => { setSelectedStage(item) }} >
+                    <c.Center>
+                      <c.Image src={`./stage/${item}.png`} w="30px" filter={selectedStage == item ? "" : "grayscale(100%)"} className={selectedStage == item ? "pulse-element" : ""} />
 
-        <c.Box mt="10px">
-          <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Activity</c.Text>
-          {selectedActivity.length > 0 &&
-            <c.Text fontFamily="roboto" fontSize="16px" fontWeight="600" bgColor="#e9e9e9" p="5px" borderRadius="xl">{selectedActivity}</c.Text>
-          }
-          {config?.activity.length > 0 &&
-          <c.HStack mt="10px">
-              {acitvity.map(a => {
-                return(
-                <c.Menu>
-                <c.MenuButton w="50%" as={c.Button} colorScheme={a.color} >
-                  {a.title}
-                </c.MenuButton>
-                <c.MenuList maxH="300px" overflowY="auto">
-                  {config?.activity?.filter(item => item?.includes(a.title)).map((item, index) => {
-                    return ( <c.MenuItem key={index} value={item.replace(item.replace(a.title+':', ''))}
-                    onClick={()=>{setSelectedActivity(item)}}
-                    > {item.replace(a.title+':', '').trim()} </c.MenuItem> );
-                  }) }
-                </c.MenuList>
-              </c.Menu>
-                )
+                    </c.Center>
+                    <c.Text mt="8px" fontSize="14px" lineHeight="13px" textAlign="center">{item}</c.Text>
+                  </c.Box>
+                );
               })}
-          </c.HStack>
+            </c.HStack>
+          </c.Box>
+
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Activity</c.Text>
+            {selectedActivity['INQUIRY']?.map((item, index) => {
+              return (
+                <c.Text
+                  key={index}
+                  fontFamily="roboto"
+                  fontSize="14px"
+                  fontWeight="600"
+                  p="5px"
+                  borderRadius="xl"
+                >
+                  {item}
+                </c.Text>
+              );
+            })}
+
+            {selectedActivity['COMPLAINT']?.map((item, index) => {
+              return (
+                <c.Text
+                  key={index}
+                  fontFamily="roboto"
+                  fontSize="14px"
+                  fontWeight="600"
+                  p="5px"
+                  borderRadius="xl"
+                >
+                  {item}
+                </c.Text>
+              );
+            })}
+
+            {config?.activity.length > 0 &&
+              <c.HStack mt="10px">
+                {activity.map(a => {
+                  return (
+                    <c.Menu closeOnSelect={false}>
+                      <c.MenuButton w="50%" as={c.Button} colorScheme={a.color} >
+                        {a.title}
+                      </c.MenuButton>
+                      <c.MenuList maxH="300px" overflowY="auto">
+                        <c.MenuOptionGroup type='checkbox' onChange={(value) => { handleSelectActivity(value, a.title) }}>
+                          {config?.activity?.filter(item => item?.includes(a.title)).map((item, index) => {
+                            return (
+                              <c.MenuItemOption key={index} value={item.replace(item.replace(a.title + ':', ''))}
+
+                              > {item.replace(a.title + ':', '').trim()} </c.MenuItemOption>);
+                          })}
+                        </c.MenuOptionGroup>
+
+                      </c.MenuList>
+                    </c.Menu>
+                  )
+                })}
+              </c.HStack>
+            }
+          </c.Box>
+
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Status</c.Text>
+            <c.Select id='status' size="sm" defaultValue={opportunity?.current_status ?? config?.status?.[0]} key={opportunity?.opportunity_id} onChange={(e) => { setSelectedStatus(e.target.value) }}>
+              {config?.status?.map((item, index) => {
+                return (<option key={index} value={item}> {item} </option>);
+              })}
+            </c.Select>
+          </c.Box>
+
+          {selectedStatus?.includes("LOST") &&
+            <c.Box mt="10px">
+              <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Close Reason</c.Text>
+              <c.Select id='close_reason' size="sm" defaultValue={opportunity?.close_reason ?? config?.close_reason?.[0]} key={opportunity?.opportunity_id}>
+                {config?.close_reason?.map((item, index) => {
+                  return (<option key={index} value={item}> {item} </option>);
+                })}
+              </c.Select>
+            </c.Box>
           }
-        </c.Box>
 
-        <c.Box mt="10px">
-          <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Status</c.Text>
-          <c.Select id='status' size="sm" defaultValue={opportunity?.current_status ?? config?.status?.[0]} key={opportunity?.opportunity_id} onChange={(e) => { setSelectedStatus(e.target.value) }}>
-            {config?.status?.map((item, index) => {
-              return ( <option key={index} value={item}> {item} </option> );
-            })}
-          </c.Select>
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Note</c.Text>
+            <c.Input h="32px" id='note' defaultValue='' onKeyDown={handleKeyDown} />
+          </c.Box>
         </c.Box>
-
-        {selectedStatus?.includes("LOST") &&
-        <c.Box mt="10px">
-          <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Close Reason</c.Text>
-          <c.Select id='close_reason' size="sm" defaultValue={opportunity?.close_reason ?? config?.close_reason?.[0]} key={opportunity?.opportunity_id}>
-            {config?.close_reason?.map((item, index) => {
-              return ( <option key={index} value={item}> {item} </option> );
-            })}
-          </c.Select>
-        </c.Box>
-        }
-
-        <c.Box mt="10px">
-          <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">Note</c.Text>
-          <c.Input h="32px" id='note' defaultValue='' onKeyDown={handleKeyDown} />
-        </c.Box>
-      </c.Box>
       }
 
       <c.VStack mt="20px">
@@ -266,13 +381,13 @@ const JournalList = (props) => {
   const { journal, config, setOpReload } = props
 
   const handleJournalDelete = (item) => {
-     if(!window.confirm("Are you sure you want to delete this journal?")) {
+    if (!window.confirm("Are you sure you want to delete this journal?")) {
       return
-     }
+    }
     let pkg = { journal_id: item.journal_id, opportunity_id: item.opportunity_id }
-      axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/journal/delete`, pkg).then(res => {
-        setOpReload(v4())
-      })
+    axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/journal/delete`, pkg).then(res => {
+      setOpReload(v4())
+    })
   }
 
 
@@ -281,17 +396,24 @@ const JournalList = (props) => {
     <c.Box mt="20px">
       {journal.map((item, index) => {
         return (
-          <c.Box w="100%" style={{ cursor: 'pointer' }} key={index} bgColor={index == journal.length - 1 && "#eaf8f0"} 
-          onClick={()=>{handleJournalDelete(item)}}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            handleJournalDelete(item);
-          }}
+          <c.Box w="100%" style={{ cursor: 'pointer' }} key={index} bgColor={index == journal.length - 1 && "#eaf8f0"}
+            onClick={() => { handleJournalDelete(item) }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              handleJournalDelete(item);
+            }}
           >
             <c.HStack p="5px" pb="10px">
               <c.Box fontFamily="Noto Sans">
                 <c.Text fontSize="10px"> {`${item.created_at.substring(0, 16)} - ${item.admin_name}`} </c.Text>
-                <c.Text fontSize="12px" fontWeight="600"> {item.activity} </c.Text>
+                <c.Text fontSize="12px" fontWeight="600">
+                  {typeof item.activity === 'string'
+                    ? item.activity
+                    : (item.activity && typeof item.activity === 'object')
+                      ? Object.values(item.activity).flat().join(', ')
+                      : ''
+                  }
+                </c.Text>
                 <c.Text fontSize="12px">{item.note.length > 0 && `📝 ${item.note}`} </c.Text>
               </c.Box>
               <c.Spacer />
