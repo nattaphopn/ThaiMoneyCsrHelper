@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import * as c from '@chakra-ui/react'
 import axios from 'axios'
 import '../App.css'
@@ -102,6 +102,7 @@ const OpportunityEditor = (props) => {
   const [selectedStage, setSelectedStage] = useState('');
   const [selectedActivity, setSelectedActivity] = useState({});
   const [opReload, setOpReload] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (editOpportunity?.opportunity_id?.length) {
@@ -135,6 +136,7 @@ const OpportunityEditor = (props) => {
     let pkg = { lead_id: lead.lead_id, deal_detail, update }
 
     if (mode == "create") {
+      setIsLoading(true)
      if (activityList.length > 0) {
   // Define an async function to handle the sequential execution
   const updateActivitiesSequentially = async () => {
@@ -163,6 +165,7 @@ const OpportunityEditor = (props) => {
         setOpReload(v4());
         setEditOpportunity(lastRes.data.opportunity);
         setScreen("viewOpportunity");
+        setIsLoading(false)
       }
     } catch (err) {
       console.error("Failed to update activities during sequential execution:", err);
@@ -245,7 +248,7 @@ if (activityList.length > 0) {
               <c.Input h="32px" id={item.field} defaultValue={opportunity?.deal_detail?.[item.field] ?? ""} />
             }
             {item.type == "dropdown" &&
-              <c.Select id={item.field} size="sm" defaultValue={opportunity?.deal_detail?.[item.field] ?? item.dropdownList[0]} key={opportunity?.opportunity_id}>
+              <c.Select id={item.field} size="sm" defaultValue={opportunity?.deal_detail?.[item.field] ?? item.dropdownList[0]} key={opReload}>
                 {item.dropdownList.map((item, index) => {
                   return <option key={index} value={item}>{item}</option>
                 })}
@@ -390,10 +393,16 @@ const JournalList = (props) => {
     })
   }
 
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [journal]);
+
 
   return (
     Object.keys(config).length &&
-    <c.Box mt="20px">
+    <c.Box mt="20px" maxH="300px" overflowY="auto">
       {journal.map((item, index) => {
         return (
           <c.Box w="100%" style={{ cursor: 'pointer' }} key={index} bgColor={index == journal.length - 1 && "#eaf8f0"}
@@ -427,6 +436,7 @@ const JournalList = (props) => {
           </c.Box>
         )
       })}
+      <div ref={bottomRef} />
     </c.Box>
 
   )
