@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSRHelper — Privacy Policy</title>
+  <style>
+    body { font-family: sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.7; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; margin-top: 32px; }
+    p, li { font-size: 15px; }
+    ul { padding-left: 20px; }
+    code { background: #f1f1f1; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    footer { margin-top: 48px; font-size: 13px; color: #888; border-top: 1px solid #eee; padding-top: 16px; }
+  </style>
+</head>
+<body>
+
+<h1>Privacy Policy — CSRHelper</h1>
+<p><strong>Last updated: May 2026</strong></p>
+
+<p>CSRHelper is a private Chrome extension developed for internal use by ThaiExpress customer service representatives.</p>
+
+<h2>1. Who This Extension Is For</h2>
+<p>CSRHelper is available only to authorised ThaiExpress staff. It is published as a private/unlisted extension and is not available to the general public.</p>
+
+<h2>2. Data the Extension Accesses</h2>
+<ul>
+  <li><strong>Customer display names</strong> — Read from LINE OA (chat.line.biz) to pre-fill CRM fields. Not stored by the extension.</li>
+  <li><strong>Authentication token</strong> — A session token issued by the internal ThaiExpress service, stored locally in <code>chrome.storage.local</code> on the user's device solely to authenticate API requests.</li>
+  <li><strong>Opportunity and lead data</strong> — Entered by the user in the side panel and submitted to the internal ThaiExpress CRM server.</li>
+  <li><strong>Page content on th.admin.eui.money</strong> — Read to auto-fill member records. Not stored by the extension.</li>
+</ul>
+
+<h2>3. How Data Is Used</h2>
+<ul>
+  <li>Display lead status badges on the LINE OA chat list</li>
+  <li>Pre-fill customer information in the CRM side panel</li>
+  <li>Create and update sales opportunities in the internal CRM</li>
+  <li>Authenticate the user's session with the internal API</li>
+</ul>
+
+<h2>4. Data Sharing</h2>
+<p>No data is shared with any third party. All data is transmitted exclusively to internal ThaiExpress servers (<code>service.th.eui.money</code>) over HTTPS. No analytics, advertising, or tracking services are used.</p>
+
+<h2>5. Data Storage</h2>
+<ul>
+  <li>Authentication token is stored locally in <code>chrome.storage.local</code> on the user's device</li>
+  <li>Lead and opportunity data is stored on the internal CRM server under ThaiExpress's data retention policies</li>
+  <li>No cookies or third-party cloud storage are used</li>
+</ul>
+
+<h2>6. Permissions Used</h2>
+<ul>
+  <li><strong>activeTab / scripting</strong> — Read customer name from LINE OA tab on user action only</li>
+  <li><strong>contextMenus</strong> — Right-click shortcut to open the CRM panel</li>
+  <li><strong>sidePanel</strong> — Display the CRM interface alongside LINE OA</li>
+  <li><strong>storage</strong> — Persist the session token locally</li>
+  <li><strong>tabs</strong> — Detect chat navigation to keep the side panel in sync</li>
+</ul>
+
+<h2>7. Security</h2>
+<p>All communication uses HTTPS. The authentication token is stored only on the local device and never transmitted to any party other than the authorised internal API.</p>
+
+<h2>8. Contact</h2>
+<p>For questions, contact the ThaiExpress development team at <strong>nattaphop.n@ku.th</strong></p>
+
+<footer>CSRHelper is an internal tool of ThaiExpress. &copy; 2026 ThaiExpress.</footer>
+
+</body>
+</html>
