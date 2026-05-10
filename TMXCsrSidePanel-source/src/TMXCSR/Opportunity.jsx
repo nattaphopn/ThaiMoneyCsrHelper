@@ -35,7 +35,10 @@ export const Opportunity = (props) => {
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunities?lead_id=${lead.lead_id}`).then(res => {
+      if (res.data.opportunities.length > 0) {
       setOpportunities(res.data.opportunities)
+      handleEditOpportunity(res.data.opportunities[res.data.opportunities.length-1]) 
+      }
     })
   }, [lead, reload])
 
@@ -63,7 +66,7 @@ export const Opportunity = (props) => {
               <c.Box w="100%" onClick={() => { handleEditOpportunity(item) }} style={{ cursor: 'pointer' }} key={index}>
                 <c.HStack p="5px" pb="10px">
                   <c.Box fontFamily="Noto Sans">
-                    <c.Text fontSize="12px" fontWeight="500">{item.created_at.substring(0, 16)}</c.Text>
+                    <c.Text fontSize="12px" fontWeight="500">{item?.updated_at?.substring(0, 16)}</c.Text>
                     <c.Text fontSize="14px" fontWeight="600" lineHeight="12px">{`${item.deal_detail?.route} ${item.deal_detail?.mode}`}</c.Text>
                     <c.Text fontSize="12px">{`${item.deal_detail?.goods}`}</c.Text>
                   </c.Box>
@@ -166,6 +169,11 @@ const OpportunityEditor = (props) => {
         setEditOpportunity(lastRes.data.opportunity);
         setScreen("viewOpportunity");
         setIsLoading(false)
+        chrome.tabs.query({ url: "https://chat.line.biz/*" }, (tabs) => {
+  if (tabs[0]) {
+    chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_LINE_BADGES" });
+  }
+});
       }
     } catch (err) {
       console.error("Failed to update activities during sequential execution:", err);
@@ -179,6 +187,11 @@ const OpportunityEditor = (props) => {
           setOpReload(v4());
           setEditOpportunity(res.data.opportunity);
           setScreen("viewOpportunity");
+          chrome.tabs.query({ url: "https://chat.line.biz/*" }, (tabs) => {
+  if (tabs[0]) {
+    chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_LINE_BADGES" });
+  }
+});
         })
       }
       return
@@ -203,6 +216,9 @@ if (activityList.length > 0) {
     setOpReload(v4());
     setReload(v4());
     setSelectedActivity({});
+    chrome.tabs.query({ url: "https://chat.line.biz/*" }, (tabs) => {
+      if (tabs[0]) chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_LINE_BADGES" });
+    });
   };
 
   processRequests();
@@ -210,6 +226,9 @@ if (activityList.length > 0) {
         axios.post(`${import.meta.env.VITE_SHIPPING_API_PATH}/csr/opportunity/update`, pkg).then(res => {
           setOpReload(v4())
           setReload(v4())
+          chrome.tabs.query({ url: "https://chat.line.biz/*" }, (tabs) => {
+            if (tabs[0]) chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_LINE_BADGES" });
+          });
         })
       }
       return
@@ -248,7 +267,7 @@ if (activityList.length > 0) {
               <c.Input h="32px" id={item.field} defaultValue={opportunity?.deal_detail?.[item.field] ?? ""} />
             }
             {item.type == "dropdown" &&
-              <c.Select id={item.field} size="sm" defaultValue={opportunity?.deal_detail?.[item.field] ?? item.dropdownList[0]} key={opReload}>
+              <c.Select id={item.field} size="sm" key={opportunity.opportunity_id} defaultValue={opportunity?.deal_detail?.[item.field] ?? item.dropdownList[0]}>
                 {item.dropdownList.map((item, index) => {
                   return <option key={index} value={item}>{item}</option>
                 })}
@@ -257,6 +276,13 @@ if (activityList.length > 0) {
           </c.Box>
         )
       })}
+
+      {opportunity.current_status?.includes('LOST') &&
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">❌LOST REASON {opportunity?.close_reason}</c.Text>
+        
+          </c.Box>
+      }
 
       <JournalList journal={journal} config={config} setOpReload={setOpReload} />
 
@@ -321,7 +347,7 @@ if (activityList.length > 0) {
                         {a.title}
                       </c.MenuButton>
                       <c.MenuList maxH="300px" overflowY="auto">
-                        <c.MenuOptionGroup type='checkbox' onChange={(value) => { handleSelectActivity(value, a.title) }}>
+                        <c.MenuOptionGroup type='checkbox'  key={opReload} onChange={(value) => { handleSelectActivity(value, a.title) }}>
                           {config?.activity?.filter(item => item?.includes(a.title)).map((item, index) => {
                             return (
                               <c.MenuItemOption key={index} value={item.replace(item.replace(a.title + ':', ''))}
@@ -414,7 +440,7 @@ const JournalList = (props) => {
           >
             <c.HStack p="5px" pb="10px">
               <c.Box fontFamily="Noto Sans">
-                <c.Text fontSize="10px"> {`${item.created_at.substring(0, 16)} - ${item.admin_name}`} </c.Text>
+                <c.Text fontSize="10px"> {`${item?.created_at?.substring(0, 16)} - ${item.admin_name}`} </c.Text>
                 <c.Text fontSize="12px" fontWeight="600">
                   {typeof item.activity === 'string'
                     ? item.activity

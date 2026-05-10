@@ -11,10 +11,10 @@ export async function fetchSession(setIsLoading) {
         useStore.setState({ user: response.data.userPkg });
         setIsLoading(false)
       } else {
-         redirectToLogin()
+        redirectToLogin()
       }
     } catch (error) {
-         redirectToLogin()
+        redirectToLogin()
     }
 }
 

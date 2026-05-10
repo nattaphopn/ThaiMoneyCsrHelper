@@ -24,7 +24,6 @@ function App() {
     }
   }
 
-
   useEffect(() => {
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
       processServiceAdminToken();
