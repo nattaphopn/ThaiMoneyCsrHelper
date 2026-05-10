@@ -2,7 +2,6 @@
     "manifest_version": 3,
     "name": "CSRHelper",
     "description": "CSRHelper make the Part-timer's life easier!",
-    "key":"MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDEThPsNhTdH7NDpjjhGGBMTUCVWRM739Oo61AeCj+4QpQHunYDYNtl+QE8oygBOtHflNQGOO0/VvNpjCn8RUuZzHtSGDXtXDwbNzZUEOfEbBiXbmFkbiSAMq3M0mN3TfYd9tiQbhqmFZDUvCINc6EIbjh/GPS7vSQWFSmVjisPwIEy1Rm0r3D4CBvAB0BvtZuS4wCkikvGrb1gwbDyRQKL5t9FUR/jHJvSCQLSg27g54dO6vaIXXv3mFusYPedHMIqIEDKLAg6DiZUvzDnC5Wakd/G2KiN/vRTdseG9ZoGjYJb/HESDNQZHx9PvSFEc58OkXTUao/pdOSzLaBqiBiBAgMBAAECggEAA8GWyvYFiqNjQA3cQDjh31Xkq2g/XdL90yQGYKkbgJEUEWzfb8I8wn1RXphZ4QJPzvcYt+zYY9DRbVVUHevSxfIs5inOJDECj1asWUSTSxMH2lkaKkR7WfFg+bFJJlNUDI0wkMdtkWc1B1q5TVVMrpX4KmeXJ72R/82W/Ix3osMN52LhbqsUkWu/R0k/bxeDXuWp/QLcTHt+2WOxohkR1WLVOGfPp98khn+bNy1vo3AGzxQzs8VaM8s6m+/NYxezH3u9zCP8aMyzo882Htb09G5AZ2DsQ/BXfaHGQHPNFVdZC0GLbOasBRXdx1Z4zlQ7CMCO+drQY8UKjYVS4TfOUQKBgQD7J5bazxkNvMT6MoUTj6tt1b9K+5gsr1XYZ7dDLuolLPRI29/KeQQi6R7wjQjsmd2NAZdQ5aK7v7jiwYZ+O93M1GIpL0ojpzuqo0a51w6LxJ/tfV003jH7/JCzyNEGLp0HNpYkP1M0n/q2TbEq/hXAt7etbbY8TZCP8GDS4BX60QKBgQDIF5hlHwaUdrxFTQLHaQ5mqX8R88c1l35o6lnDe2VBiaomdWmmFO/Judy4V/cQvooq70c6/koWEacScAloZMVdLlYn28axff1aVbVu5ihD5AOuX9H8364f8cJ3EC9Y6AaEl4+6y5GWtecA6JRpNtTgw0HlfvsUlXijofZe4MpOsQKBgACe7m6ICIXSK6J6sX2E42WYG6rxyESEAnBQgVF3Mjj5TXlIodr8RZhYfy0VDCqZjsSkdl1K1AYmySw2UkDJoRi6hauYZFSGO02GrcwTzgNmbwbFQo+45OK8kxb+rhWX0+eKqQBZ77i3lIUS2BdFHYSmb5vMI6Euh+bzLyoWR7ehAoGBAK6Rb2Khy+LRKHaptof1TxwgOn2WGrHV5vJvqzrSOEgSbAE7pJ3CXGW5oyitjh7srazBr3p3inlwkzuRxZNvf4VJPN9vbg1CZzxd1HnZkT2R++gxLwoYuFikWs33r+c4Hx+k/z+wBOfg8ZYoU/rrXJRvpdksjK+rrGHOlxy1r6sxAoGBAKIS58tEDwa7FPFpWWpxD4eTLZpOyzjGtVGAMZ80KD7sWerqPKfavW7FJW251eGxw3HaPznwfyX0kn1Sq+hVhLzVnn9ygTMQL9wjrJMfneMUaord7eDR7Z9JFxjji9dAShRMEC58xp0zh3PAYisDMVvz8GbkW2PQ2IbYsVGN+IGP",
     "version": "2.1.0",
     "icons": {
         "16": "logo.png",
@@ -19,7 +18,6 @@
     },
     "externally_connectable": {
     "matches": [
-        "http://localhost:5173/*",
         "https://service.th.dev.eui.money/*",
         "https://service.th.eui.money/*"
     ]
@@ -38,7 +36,8 @@
     "content_scripts": [
         {
             "matches": [
-                "<all_urls>"
+                "https://th.admin.eui.money/*",
+                "https://service.th.eui.money/*"
             ],
             "run_at": "document_start",
             "js": [
@@ -70,6 +69,9 @@
         "service_worker": "background.js"
     },
     "host_permissions": [
-        "<all_urls>"
+        "https://chat.line.biz/*",
+        "https://th.admin.eui.money/*",
+        "https://service.th.dev.eui.money/*",
+        "https://service.th.eui.money/*"
     ]
 }

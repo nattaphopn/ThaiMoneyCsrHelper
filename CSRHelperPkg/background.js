@@ -38,15 +38,13 @@ const sendChatDetailToTmxCsr = (info, tab) => {
       name = info.selectionText
     }
     chrome.sidePanel.open({ tabId: tab.id });
-    const sendMsg = () => {
+    const sendMsg = (retries = 3) => {
+      if (retries <= 0) return;
       try {
-        chrome.runtime.sendMessage({
-        type: "TMX_CSR_DATA",
-        payload: { name, url, channel }
-      });
-      } catch(err) {sendMsg()}}
-
-    setTimeout(() => {sendMsg()}, 500)
+        chrome.runtime.sendMessage({ type: "TMX_CSR_DATA", payload: { name, url, channel } });
+      } catch (err) { sendMsg(retries - 1); }
+    };
+    setTimeout(() => { sendMsg(); }, 500);
 }
 
 // Handle click on context menu
@@ -57,19 +55,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-
-function pasteText(text) {
-  console.log("initPaste")
-  const activeElement = document.activeElement;
-  if (activeElement) {
-    console.log("found Element")
-    for (const char of text) {
-      const event = new InputEvent("input", { bubbles: true });
-      activeElement.value += char;
-      activeElement.dispatchEvent(event);
-    }
-  }
-}
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -104,7 +89,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function autofillFields(pkg) {
-  window.postMessage({ type: "FROM_EXTENSION", data: pkg }, ["http://localhost:5173", "https://euith-service.web.app/"]);
+  window.postMessage({ type: "FROM_EXTENSION", data: pkg }, ["https://euith-service.web.app/"]);
 }
 
 // Track LINE chat path changes
@@ -129,22 +114,23 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 
 // Listen to Data From Website
 // For receiving service_admin_token
+const ALLOWED_EXTERNAL_ORIGINS = [
+  "https://service.th.dev.eui.money",
+  "https://service.th.eui.money"
+];
+
 chrome.runtime.onMessageExternal.addListener(
   (request, sender, sendResponse) => {
-    // Check the action type to handle different requests
+    if (!ALLOWED_EXTERNAL_ORIGINS.some(o => sender.url?.startsWith(o))) return;
     if (request.action === "service_admin_token") {
       chrome.storage.local.set({ service_admin_token: request.data }, () => {
-
-      const sendMsg = () => {
-        try {
-          chrome.runtime.sendMessage({
-          type: "TMX_CSR_REFETCHAUTH",
-          payload: {"command":"TMX_CSR_REFETCHAUTH"}
-        });
-        } catch(err) {sendMsg()}}
-        
-        sendMsg()
-
+        const sendMsg = (retries = 3) => {
+          if (retries <= 0) return;
+          try {
+            chrome.runtime.sendMessage({ type: "TMX_CSR_REFETCHAUTH", payload: { command: "TMX_CSR_REFETCHAUTH" } });
+          } catch (err) { sendMsg(retries - 1); }
+        };
+        sendMsg();
       });
     }
     return true;

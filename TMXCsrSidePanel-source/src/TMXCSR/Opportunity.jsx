@@ -248,7 +248,7 @@ if (activityList.length > 0) {
   }
 
   const activity = [{ "title": 'INQUIRY', "color": "blue" }, { "title": 'COMPLAINT', "color": "red" }]
-console.log(opportunity)
+
   return (
     Object.keys(config).length &&
     <c.Box>
@@ -276,6 +276,13 @@ console.log(opportunity)
           </c.Box>
         )
       })}
+
+      {opportunity.current_status?.includes('LOST') &&
+          <c.Box mt="10px">
+            <c.Text fontFamily="roboto" fontSize="14px" fontWeight="600">❌LOST REASON {opportunity?.close_reason}</c.Text>
+        
+          </c.Box>
+      }
 
       <JournalList journal={journal} config={config} setOpReload={setOpReload} />
 
