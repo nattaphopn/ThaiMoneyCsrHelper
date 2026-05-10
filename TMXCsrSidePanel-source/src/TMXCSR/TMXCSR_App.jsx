@@ -7,7 +7,6 @@ function TMXCSR_App() {
 
     const element = useRoutes([
     { path: '', element: <TmxCsr />},
-   // { path: 'mgmTickets/:mgmTicket_id', element: <ViewMgmTicket/> },
   ]);
 
   return (

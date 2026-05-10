@@ -55,6 +55,15 @@
                 "csr.js"
             ],
             "all_frames": true
+        },
+        {
+            "matches": [
+                "https://chat.line.biz/*"
+            ],
+            "run_at": "document_end",
+            "js": [
+                "line_chat_emoji.js"
+            ]
         }
     ],
     "background": {

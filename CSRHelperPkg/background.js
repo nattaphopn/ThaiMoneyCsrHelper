@@ -13,10 +13,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 })
 
-// Handle click on context menu
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  const selectedItem = menuItems.find(item => item.id === info.menuItemId);
-  if (selectedItem && selectedItem.id == "TMX_CSR") {
+const sendChatDetailToTmxCsr = (info, tab) => {
     let name = ""
     let channel = ""
     const url = tab.url
@@ -50,6 +47,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       } catch(err) {sendMsg()}}
 
     setTimeout(() => {sendMsg()}, 500)
+}
+
+// Handle click on context menu
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  const selectedItem = menuItems.find(item => item.id === info.menuItemId);
+  if (selectedItem && selectedItem.id == "TMX_CSR") {
+    sendChatDetailToTmxCsr(info, tab)
   }
 });
 
@@ -102,6 +106,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function autofillFields(pkg) {
   window.postMessage({ type: "FROM_EXTENSION", data: pkg }, ["http://localhost:5173", "https://euith-service.web.app/"]);
 }
+
+// Track LINE chat path changes
+const lineTabPaths = {};
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (!changeInfo.url) return;
+  try {
+    const url = new URL(changeInfo.url);
+    if (url.hostname !== "chat.line.biz") return;
+    const prev = lineTabPaths[tabId];
+    if (prev !== url.pathname) {
+      lineTabPaths[tabId] = url.pathname;
+      sendChatDetailToTmxCsr({ selectionText: null }, tab);
+    }
+  } catch (_) {}
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  delete lineTabPaths[tabId];
+});
 
 // Listen to Data From Website
 // For receiving service_admin_token
