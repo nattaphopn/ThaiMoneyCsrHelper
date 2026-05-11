@@ -2,7 +2,8 @@
     "manifest_version": 3,
     "name": "CSRHelper",
     "description": "CSRHelper make the Part-timer's life easier!",
-    "version": "2.1.0",
+    "key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqLUaZohyPlaS59ajZJABIQcAEZFthgsL6lnmW7IxAvJlSekK5/63JFbpGKMTKjiGe2ipRQuFSqiaETpCRD0Pd9rcKe8fTvMAZ0qMjqQUcoi+Cz0Hs2FSACMwQwLMs8IAw0GbOwBmn3LuvjpXV4isrM8jR5zRw9d29FSxVf+DBC+vWUM1o3zZ4ZJcq2fhF88Nx6WZG1vylR/LTOQuwegh2J7H473SVbCh4E1ColM+yqeAoI1aI2msThCQljn4bV48H6XoLrqW8MIAqM7lROSwBxAiadYUfu6IbzH89UguKHCcP4roAasKQ3guYOvaZigx53HpicxxaNx6t5dNDWK2BQIDAQAB",
+    "version": "2.1.1",
     "icons": {
         "16": "logo.png",
         "32": "logo.png",

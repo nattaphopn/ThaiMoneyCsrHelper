@@ -23,7 +23,7 @@ function injectEmojis() {
     const leadName = h6.textContent.trim();
     chrome.storage.local.get('service_admin_token', ({ service_admin_token }) => {
       const token = service_admin_token?.token;
-      fetch(`http://localhost:19902/csr/leads?name=${leadName}&channel=line`, {
+      fetch(`https://th.express.eui.money/api/csr/leads?name=${leadName}&channel=line`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       })
         .then(r => r.json())
@@ -31,8 +31,6 @@ function injectEmojis() {
           if (res.status == 'success') {
 
             const lead = res.leads[0]
-
-            console.log(res)
 
             const contentCol = h6.parentElement.parentElement;
             const manualBadgeRow = item.querySelector('div.badge.badge-outline-info')?.parentElement;
@@ -102,12 +100,12 @@ function injectEmojis() {
           }
 
           else {
-            const isManual = !!item.querySelector('div.badge.badge-outline-info');
-            if (!isManual) {
+            //const isManual = !!item.querySelector('div.badge.badge-outline-info');
+            //if (!isManual) {
               item.style.backgroundColor = '#fdfbfb';
               item.classList.add('csr-error-item');
               h6.style.color = '#c0392b';
-            }
+            //}
           }
 
           /*
