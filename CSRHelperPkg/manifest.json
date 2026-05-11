@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "CSRHelper",
     "description": "CSRHelper make the Part-timer's life easier!",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "icons": {
         "16": "logo.png",
         "32": "logo.png",
